@@ -17,7 +17,7 @@ void loop()
 void reset()
 {
   digitalWrite(8, HIGH);
-  delayMicroseconds(500);
+  delayMicroseconds(2000);
   digitalWrite(9, HIGH);
 }
 

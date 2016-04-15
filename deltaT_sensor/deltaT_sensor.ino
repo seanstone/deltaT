@@ -20,8 +20,16 @@ void setup()
     attachInterrupt(0, change2, CHANGE);
     attachInterrupt(1, change3, CHANGE);
 
+    pinMode(8, OUTPUT);
+    digitalWrite(8, LOW);
+    pinMode(4, INPUT);
+
     d1 = digitalRead(2);
     d2 = digitalRead(3);
+
+    lcd.setCursor(0, 0);
+    lcd.print("START");
+    delay(1000);
 }
 
 /*
@@ -69,8 +77,15 @@ void evalThreshold()
 }
 */
 
+bool  LEDon = false,
+      LEDswitched = false;
+
 void loop() 
 {
+    if (digitalRead(4)) {
+      if (!LEDswitched) digitalWrite(8, LEDon = !LEDon), LEDswitched = true;
+    } else LEDswitched = false;
+      
     lcd.setCursor(0, 0);
     lcd.print("1 ");
     lcd.print(d1?"ON ":"OFF");
@@ -83,13 +98,15 @@ void loop()
         lcd.print("                ");
         if (t1 && t2)
         {
-            dt = t2-t1;
-            lcd.setCursor(0, 1);
-            lcd.print("t2-t1= ");
-            float ms = dt/1000.0;
-            lcd.print(ms, 3);
-            lcd.print(" ms");
-       }
+            if ((dt = t2-t1) > 0)
+            {
+                lcd.setCursor(0, 1);
+                lcd.print("t2-t1= ");
+                float ms = dt/1000.0;
+                lcd.print(ms, 3);
+                lcd.print(" ms");
+            }
+        }
     }
     
     // readValues();
@@ -97,5 +114,5 @@ void loop()
     // evalThreshold();
 }
 
-void change2() { t1 = (d1 = !d1) ? micros() : dt = 0; }
-void change3() { t2 = (d2 = !d2) ? micros() : dt = 0; }
+void change2() { t1 = (d1 = digitalRead(2)) ? micros() : dt = 0; }
+void change3() { t2 = (d2 = digitalRead(3)) ? micros() : 0; }
